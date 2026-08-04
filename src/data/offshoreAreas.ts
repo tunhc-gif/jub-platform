@@ -305,12 +305,36 @@ export const offshoreFields: OffshoreField[] = [
     mapLat: 14.193,
     mapLng: 96.047,
   },
+  {
+    slug: "arabian-gulf-ksa",
+    countrySlug: "ksa",
+    region: "Arabian Gulf (Saudi Aramco)",
+    nameVi: "Vịnh Ba Tư – Khu vực Saudi Aramco",
+    nameEn: "Arabian Gulf – Saudi Aramco Area",
+    lat: "≈27.9° N (đại diện khu vực: Zuluf/Marjan/Safaniya)",
+    lon: "≈48.8° E",
+    waterDepth: "≈10–60 m (vùng nông; không dùng cho <3 m LAT)",
+    nearestPort: "Jubail / Ras Tanura (KSA)",
+    dataSource:
+      "Saudi Aramco / DHI — Arabian Gulf MetOcean Database Documentation (SAER-6406, 30/05/2012), hindcast PERGOS/UNIWAVE. Gió: Bảng 9.3 (persistence gió 3 giờ theo tháng, % vượt ngưỡng) — chuyển thành phân bố theo bin. Sóng: Bảng 9.5 phân bố Hs annual (cột Omni/Total). LƯU Ý: tài liệu KHÔNG in phân bố Hs theo từng tháng nên sóng dùng phân bố ANNUAL áp đều 12 tháng (mùa vụ chủ yếu thể hiện qua gió).",
+    statPeriod: "Gió: theo tháng (persistence 3h). Sóng: annual omni áp đều 12 tháng. Hindcast dài hạn.",
+    lastUpdated: "2012-05 (tài liệu) · tích hợp 2026-08",
+    windMeta: "Gió 10 m amsl (m/s) — Bảng 9.3 (đại diện khu vực Saudi Aramco)",
+    waveMeta: "Hs (m) — Bảng 9.5 phân bố annual omni (áp đều 12 tháng)",
+    dataKind: "Hindcast (DHI/PERGOS — đại diện khu vực)",
+    sample: false,
+    defaultWindLimit: 12,
+    defaultHsLimit: 1.5,
+    mapLat: 27.9,
+    mapLng: 48.8,
+  },
 ];
 
 // Region ordering per country (for grouping on the country page).
 export const regionsByCountry: Record<string, string[]> = {
   vietnam: ["Vũng Tàu", "Nam Côn Sơn", "Cửu Long", "Malay – Thổ Chu", "Sông Hồng"],
   qatar: ["Maydan Mahzam", "Sensor Tower Platforms (Halul)", "Bul Hanine", "North Field"],
+  ksa: ["Arabian Gulf (Saudi Aramco)"],
   nigeria: ["OML 112 (Niger Delta)"],
   thailand: ["Block B8/32 (Gulf of Thailand)"],
   myanmar: ["Biển Andaman"],
