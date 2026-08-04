@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------
+   Theme system: each [data-theme] sets a full palette
+   consumed via Tailwind's arbitrary CSS-var colors.
+   Default = "pos" (PTSC Offshore Services brand DNA):
+   Navy Blue (trust) + Vibrant Red (energy/safety) + White.
+---------------------------------------------------- */
+:root,
+[data-theme="pos"] {
+  --surface: #ffffff;
+  --surface-2: #f5f7fb;
+  --surface-3: #eaeff8;
+  --border-color: #dbe3f0;
+  --ink: #0b2545;
+  --ink-soft: #5c6b85;
+  --brand-50: #eaf0fb;
+  --brand-100: #c9d9f0;
+  --brand-300: #6e8fc9;
+  --brand-400: #3a5f9e;
+  --brand-500: #0f3460;
+  --brand-600: #0b274a;
+  --brand-700: #081c37;
+  --brand-900: #050f1f;
+  --accent: #e4002b;
+}
+
+[data-theme="ocean"] {
+  --surface: #0b1220;
+  --surface-2: #101a30;
+  --surface-3: #16233f;
+  --border-color: #22314f;
+  --ink: #eef3ff;
+  --ink-soft: #9fb0cf;
+  --brand-50: #eef6ff;
+  --brand-100: #d7e9ff;
+  --brand-300: #7fb4ff;
+  --brand-400: #4d97ff;
+  --brand-500: #2f7dff;
+  --brand-600: #1f63e0;
+  --brand-700: #184fb3;
+  --brand-900: #0c2a63;
+  --accent: #33d6c0;
+}
+
+[data-theme="sunset"] {
+  --surface: #1c1210;
+  --surface-2: #241713;
+  --surface-3: #2e1e18;
+  --border-color: #4a2f24;
+  --ink: #fff2e9;
+  --ink-soft: #d8b6a2;
+  --brand-50: #fff2e6;
+  --brand-100: #ffdfc0;
+  --brand-300: #ffab6b;
+  --brand-400: #ff8a3d;
+  --brand-500: #f9701a;
+  --brand-600: #d9590f;
+  --brand-700: #a8440b;
+  --brand-900: #5a2306;
+  --accent: #ffd166;
+}
+
+[data-theme="emerald"] {
+  --surface: #071712;
+  --surface-2: #0b2119;
+  --surface-3: #102c22;
+  --border-color: #1c4536;
+  --ink: #eafff3;
+  --ink-soft: #9fd8bf;
+  --brand-50: #e7fff2;
+  --brand-100: #bdf7db;
+  --brand-300: #5fe3ab;
+  --brand-400: #2ecf92;
+  --brand-500: #17b57c;
+  --brand-600: #109464;
+  --brand-700: #0c7350;
+  --brand-900: #073b29;
+  --accent: #a3ff8c;
+}
+
+[data-theme="slate"] {
+  --surface: #ffffff;
+  --surface-2: #f4f6fb;
+  --surface-3: #e9edf6;
+  --border-color: #d9e0ee;
+  --ink: #10172a;
+  --ink-soft: #57657f;
+  --brand-50: #eef1fb;
+  --brand-100: #d7ddf4;
+  --brand-300: #9aa8e0;
+  --brand-400: #6d80cd;
+  --brand-500: #4a5cb8;
+  --brand-600: #3a4899;
+  --brand-700: #2c377a;
+  --brand-900: #171d40;
+  --accent: #ff5da2;
+}
+
+html,
+body {
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
+* {
+  border-color: var(--border-color);
+}
+
+/* Brand imagery: PTSC Guardian offshore vessel, fixed behind every screen.
+   A top-to-bottom white scrim keeps long data tables readable further down the page. */
+body {
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(245, 247, 251, 0.55) 35%, rgba(245, 247, 251, 0.88) 100%),
+    url("/brand/ptsc-guardian-bg.webp");
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+[data-theme="ocean"] body,
+[data-theme="sunset"] body,
+[data-theme="emerald"] body,
+[data-theme="slate"] body {
+  background-image: none;
+}
+
+@layer base {
+  /* Brand headline rule: bold/black weight, uppercase, tight tracking = "sự chắc chắn". */
+  .brand-headline {
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+}
+
+/* Dot-pattern texture is only used for the alternate (non-photo) themes below —
+   the "pos" brand theme shows the vessel photo through instead. */
+.bg-grid {
+  background-image: none;
+}
+
+[data-theme="ocean"] .bg-grid,
+[data-theme="sunset"] .bg-grid,
+[data-theme="emerald"] .bg-grid,
+[data-theme="slate"] .bg-grid {
+  background-image: radial-gradient(circle at 1px 1px, var(--border-color) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Diagonal-cut accent flag used before page/section titles (shape language: parallelogram). */
+.diagonal-tag {
+  clip-path: polygon(0 0, 100% 0, 70% 100%, 0% 100%);
+}
+
+/* Large diagonal geometric block for hero/split-screen backgrounds. */
+.diagonal-panel {
+  clip-path: polygon(18% 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+/* Translucent header backing — the plain `bg-surface/80` opacity modifier doesn't work
+   here since --surface is a hex value, not an opacity-capable Tailwind color channel. */
+.header-glass {
+  background-color: color-mix(in srgb, var(--surface) 82%, transparent);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 6px;
+}
