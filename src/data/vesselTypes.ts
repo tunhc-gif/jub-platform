@@ -39,11 +39,11 @@ export const vesselTypes: VesselType[] = [
   {
     slug: "dsv",
     code: "DSV",
-    nameVi: "Tàu lặn (Diving Support Vessel)",
-    nameEn: "Diving Support Vessel",
-    descVi: "Tàu hỗ trợ hoạt động lặn và can thiệp dưới nước.",
-    descEn: "Vessel supporting diving operations and subsea intervention.",
-    hasData: false,
+    nameVi: "Tàu hỗ trợ ngầm (Subsea/DSV)",
+    nameEn: "Subsea & Diving Support Vessel",
+    descVi: "Tàu hỗ trợ công tác ngầm: thi công/lắp đặt ngầm (OCV), ROV/IMR, can thiệp giếng và hỗ trợ lặn (DSV).",
+    descEn: "Vessels supporting subsea work: subsea construction/installation (OCV), ROV/IMR, well intervention and diving (DSV).",
+    hasData: true,
   },
   {
     slug: "dlb",

@@ -40,6 +40,7 @@ const CATEGORY_FILE = {
   hlv: "hlvVessels",
   jub: "jubExtra", // tàu mới luôn vào jubExtra (jubVessels là bộ gốc)
   ocv: "ocvVessels",
+  dsv: "dsvVessels",
   "supply-boat": "supplyBoatVessels",
   workboat: "workBoatVessels",
   crewboat: "crewboatVessels",
@@ -51,6 +52,7 @@ const ALL_FILES = [
   ["jubVessels", "jub"],
   ["jubExtra", "jub"],
   ["ocvVessels", "ocv"],
+  ["dsvVessels", "dsv"],
   ["supplyBoatVessels", "supply-boat"],
   ["workBoatVessels", "workboat"],
   ["crewboatVessels", "crewboat"],
@@ -105,7 +107,9 @@ function detectCategory(idType) {
   if (/jack.?up|self.?elevat|liftboat|liftboat/.test(t)) return "jub";
   if (/heavy.?lift|crane vessel|crane barge|derrick/.test(t)) return "hlv";
   if (/barge/.test(t)) return "floatel";
-  if (/ahts|anchor handling|\baht\b|mpsv|multi.?purpose|subsea|construction|\bocv\b|dp2 rov|dive/.test(t)) return "ocv";
+  // Subsea support (rộng): thi công/lắp đặt ngầm, ROV/IMR, DSV, well intervention, MPSV, SOV
+  if (/subsea|\bdsv\b|dscv|diving|\bdive\b|\brov\b|\bimr\b|well intervention|offshore construction|construction vessel|light construction|\bmpsv\b|multi.?purpose support|\bsov\b|\bocv\b/.test(t)) return "dsv";
+  if (/ahts|anchor handling|\baht\b|multi.?purpose|dp2 rov/.test(t)) return "ocv";
   if (/crew.?boat/.test(t)) return "crewboat";
   if (/\bpsv\b|platform supply/.test(t)) return "supply-boat";
   return "workboat";
