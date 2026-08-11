@@ -14,6 +14,8 @@
 //   node scripts/vessel-tool.mjs check <imo|tên>                Kiểm tra trùng.
 //   node scripts/vessel-tool.mjs stats                          Đếm tàu theo nhóm.
 //   node scripts/vessel-tool.mjs template [category]            In JSON mẫu đủ field.
+//   node scripts/vessel-tool.mjs scan <dir>                     Liệt kê CHỈ file spec
+//        đáng đọc; tự bỏ qua CAD/bản vẽ/GA/chứng chỉ/bảo hiểm (tiết kiệm token).
 //   node scripts/vessel-tool.mjs extract <file.pdf>             pdftotext -layout.
 //   node scripts/vessel-tool.mjs imo <file.xlsx|csv>            Điền idImo còn thiếu
 //        theo cột (displayName, idImo) — chỉ ghi vào tàu đang thiếu IMO.
@@ -295,6 +297,49 @@ function cmdExtract(args) {
   }
 }
 
+// Quét 1 folder, lọc ra CHỈ các file spec đáng đọc — tự bỏ qua CAD/bản vẽ/chứng
+// chỉ/bảo hiểm để không phí token đọc file vô ích.
+const DATA_EXT = /\.(pdf|docx?|xlsx?)$/i;
+const CAD_EXT = /\.(dwg|dxf|dgn|dwf|rvt|skp|igs|iges|stp|step|3ds|sldprt|sldasm|prt|catpart)$/i;
+// Tên file (hoặc thư mục cha) là BẢN VẼ / CHỨNG CHỈ / HÀNH CHÍNH -> bỏ qua.
+const SKIP_RE = new RegExp([
+  "ga plan","general arrangement","\\barrangement\\b","drawing","\\bdwg\\b","load ?chart","crane load",
+  "tank plan","capacity plan","lines plan","docking","layout","mooring pattern","deck layout",
+  "certificate","\\bcert\\b","\\bcoi\\b","\\bcor\\b","class status","class cert","trading cert",
+  "insurance","\\bp&?i\\b","h&m","\\bmlc\\b","\\bissc\\b","\\bism\\b","\\bsmc\\b","iopp","iapp","marpol","solas",
+  "\\bovid\\b","manning","\\bcv[ ._-]","garbage","sewage","ballast water","anti.?fouling","tonnage",
+  "registry","radio","helideck","bollard.*cert","survey","\\bfmea\\b","dp (trial|proving)","annual trial",
+  "exemption","statement of compliance","record of","p&i|h&amp;m","exceptions?","cover note","commitment",
+].join("|"), "i");
+// Tên file là SPEC thật -> ưu tiên đọc.
+const SPEC_RE = /spec|particular|brochure|technical proposal|proposal|\bbrief\b|vessel data|ship data|data ?sheet|specification|vsl specs|\bvp -|ship's specification|vessel status/i;
+
+function cmdScan(args) {
+  const dir = args[0];
+  if (!dir || !fs.existsSync(dir)) { console.error("Cần đường dẫn folder."); process.exit(1); }
+  const all = fs.readdirSync(dir, { recursive: true }).map((f) => String(f));
+  let cad = 0, skipDoc = 0;
+  const specs = [], other = [];
+  for (const rel of all) {
+    const full = path.join(dir, rel);
+    let st; try { st = fs.statSync(full); } catch { continue; }
+    if (!st.isFile()) continue;
+    if (CAD_EXT.test(rel)) { cad++; continue; }
+    if (!DATA_EXT.test(rel)) continue; // ảnh/khác -> bỏ im lặng
+    if (SKIP_RE.test(rel)) { skipDoc++; continue; } // bản vẽ/chứng chỉ/hành chính
+    if (SPEC_RE.test(rel)) specs.push(rel);
+    else other.push(rel); // file dữ liệu nhưng tên không rõ -> để cân nhắc
+  }
+  const norm = (s) => s.replace(/\\/g, "/");
+  console.log("=== SPEC nên đọc (" + specs.length + ") ===");
+  specs.sort().forEach((f) => console.log("  " + norm(f)));
+  console.log("\n=== File dữ liệu khác — tên không rõ, cân nhắc (" + other.length + ") ===");
+  other.sort().forEach((f) => console.log("  " + norm(f)));
+  console.log("\n--- ĐÃ BỎ QUA (không đọc) ---");
+  console.log("  CAD/bản vẽ (đuôi .dwg/.dxf…): " + cad);
+  console.log("  Bản vẽ GA / chứng chỉ / bảo hiểm / hành chính (theo tên): " + skipDoc);
+}
+
 // Điền idImo còn thiếu từ file mapping (.xlsx OOXML hoặc .csv) theo displayName.
 function cmdImo(args) {
   const file = args[0];
@@ -357,6 +402,7 @@ switch (cmd) {
   case "stats": cmdStats(); break;
   case "template": cmdTemplate(rest); break;
   case "extract": cmdExtract(rest); break;
+  case "scan": cmdScan(rest); break;
   case "imo": cmdImo(rest); break;
   default:
     console.log(`vessel-tool — tự động hoá tích hợp tàu.

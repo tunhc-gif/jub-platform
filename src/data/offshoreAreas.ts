@@ -316,7 +316,7 @@ export const offshoreFields: OffshoreField[] = [
     waterDepth: "≈10–60 m (vùng nông; không dùng cho <3 m LAT)",
     nearestPort: "Jubail / Ras Tanura (KSA)",
     dataSource:
-      "Saudi Aramco / DHI — Arabian Gulf MetOcean Database Documentation (SAER-6406, 30/05/2012), hindcast PERGOS/UNIWAVE. Gió: Bảng 9.3 (persistence gió 3 giờ theo tháng, % vượt ngưỡng) — chuyển thành phân bố theo bin. Sóng: Bảng 9.5 phân bố Hs annual (cột Omni/Total). LƯU Ý: tài liệu KHÔNG in phân bố Hs theo từng tháng nên sóng dùng phân bố ANNUAL áp đều 12 tháng (mùa vụ chủ yếu thể hiện qua gió).",
+      "Saudi Aramco / DHI — Arabian Gulf MetOcean Database (SAER-6406, 30/05/2012), hindcast PERGOS/UNIWAVE. Gió: dựng trực tiếp từ bảng exceedance gió 3h theo tháng (file SAER6406_Wind_3h_Persistence_Distribution.xlsx, ngưỡng 1–20 m/s) → phân bố theo bin. Sóng: Bảng 9.5 phân bố Hs annual (cột Omni/Total). LƯU Ý: nguồn KHÔNG có phân bố Hs theo từng tháng nên sóng dùng phân bố ANNUAL áp đều 12 tháng (mùa vụ chủ yếu thể hiện qua gió).",
     statPeriod: "Gió: theo tháng (persistence 3h). Sóng: annual omni áp đều 12 tháng. Hindcast dài hạn.",
     lastUpdated: "2012-05 (tài liệu) · tích hợp 2026-08",
     windMeta: "Gió 10 m amsl (m/s) — Bảng 9.3 (đại diện khu vực Saudi Aramco)",
