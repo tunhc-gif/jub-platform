@@ -43,6 +43,9 @@ const CATEGORY_FILE = {
   jub: "jubExtra", // tàu mới luôn vào jubExtra (jubVessels là bộ gốc)
   ocv: "ocvVessels",
   dsv: "dsvVessels",
+  ahts: "ahtsVessels",
+  dlb: "dlbVessels",
+  "floatover-barge": "floatoverBargeVessels",
   "supply-boat": "supplyBoatVessels",
   workboat: "workBoatVessels",
   crewboat: "crewboatVessels",
@@ -55,6 +58,9 @@ const ALL_FILES = [
   ["jubExtra", "jub"],
   ["ocvVessels", "ocv"],
   ["dsvVessels", "dsv"],
+  ["ahtsVessels", "ahts"],
+  ["dlbVessels", "dlb"],
+  ["floatoverBargeVessels", "floatover-barge"],
   ["supplyBoatVessels", "supply-boat"],
   ["workBoatVessels", "workboat"],
   ["crewboatVessels", "crewboat"],
@@ -103,17 +109,33 @@ function validImo(s) {
   return /^\d{7}$/.test(String(s || "").trim());
 }
 
-// Phân loại category từ idType (nếu không có category/force).
+// Phân loại category từ idType (nếu không có category/force). Ưu tiên đồng bộ
+// với scripts/reclassify.mjs (bảng 11 nhóm). Chỉ dựa trên text idType.
 function detectCategory(idType) {
   const t = String(idType || "").toLowerCase();
-  if (/jack.?up|self.?elevat|liftboat|liftboat/.test(t)) return "jub";
-  if (/heavy.?lift|crane vessel|crane barge|derrick/.test(t)) return "hlv";
+  const ahtsText = /anchor handling|\bahts\b|\baht\b|\bahs\b|anchor handler/.test(t);
+  const supplyText = /\bpsv\b|platform supply|supply vessel|supply boat/.test(t);
+  // 1. JUB (không tính tàu khai báo AHTS/Supply)
+  if (/jack.?up|self.?elevat|lift ?boat/.test(t) && !ahtsText && !supplyText) return "jub";
+  // 2. Floatel (nhà nổi lưu trú)
+  if (/accommodation|accomodation|flotel|floatel/.test(t)) return "floatel";
+  // 3. DLB
+  if (/derrick|pipe ?lay|lay ?barge|\bdlb\b|reel ?lay|stinger|firing line/.test(t)) return "dlb";
+  // 4. HLV
+  if (/heavy.?lift|crane vessel|crane barge|floating crane|revolving crane|sheer ?leg/.test(t)) return "hlv";
+  // 5. Floatover
+  if (/float ?over|float-over/.test(t)) return "floatover-barge";
+  // 6. DSV (lặn)
+  if (/saturation|diving|dive support|\bdsv\b|dscv|\bdive\b|dive bell/.test(t)) return "dsv";
+  // 7. OCV/CSV (construction thật — KHÔNG gồm "offshore support vessel" chung chung)
+  if (/construction|\bcsv\b|\bocv\b|subsea|multi.?purpose support|multi.?role|\bmpsv\b|\bmsv\b|\brov\b|\bimr\b|well intervention|light construction|walk.?to.?work|\bw2w\b|cable ?lay|moonpool|\bsov\b/.test(t)) return "ocv";
+  // 8. Crewboat
+  if (/crew.?boat|\bfcb\b|fast crew|fast supply|fast support|passenger/.test(t)) return "crewboat";
+  // 9. AHTS
+  if (ahtsText) return "ahts";
+  // 10. Supply/PSV
+  if (supplyText || /\bosv\b/.test(t)) return "supply-boat";
   if (/barge/.test(t)) return "floatel";
-  // Subsea support (rộng): thi công/lắp đặt ngầm, ROV/IMR, DSV, well intervention, MPSV, SOV
-  if (/subsea|\bdsv\b|dscv|diving|\bdive\b|\brov\b|\bimr\b|well intervention|offshore construction|construction vessel|light construction|\bmpsv\b|multi.?purpose support|\bsov\b|\bocv\b/.test(t)) return "dsv";
-  if (/ahts|anchor handling|\baht\b|multi.?purpose|dp2 rov/.test(t)) return "ocv";
-  if (/crew.?boat/.test(t)) return "crewboat";
-  if (/\bpsv\b|platform supply/.test(t)) return "supply-boat";
   return "workboat";
 }
 

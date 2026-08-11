@@ -8,6 +8,9 @@ import crewboat from "./crewboatVessels.json";
 import floatel from "./floatelVessels.json";
 import hlv from "./hlvVessels.json";
 import dsv from "./dsvVessels.json";
+import ahts from "./ahtsVessels.json";
+import dlb from "./dlbVessels.json";
+import floatoverBarge from "./floatoverBargeVessels.json";
 
 // Every vessel carries its category slug so links and the AI Agent can route correctly.
 export type Vessel = JubVessel & { category: string };
@@ -22,6 +25,9 @@ export const vesselsByType: Record<string, Vessel[]> = {
   jub: tag([...(jubBase as unknown[]), ...(jubExtra as unknown[])], "jub"),
   ocv: tag(ocv as unknown[], "ocv"),
   dsv: tag(dsv as unknown[], "dsv"),
+  ahts: tag(ahts as unknown[], "ahts"),
+  dlb: tag(dlb as unknown[], "dlb"),
+  "floatover-barge": tag(floatoverBarge as unknown[], "floatover-barge"),
   "supply-boat": tag(supplyBoat as unknown[], "supply-boat"),
   workboat: tag(workBoat as unknown[], "workboat"),
   crewboat: tag(crewboat as unknown[], "crewboat"),

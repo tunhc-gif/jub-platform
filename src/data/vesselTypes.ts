@@ -46,13 +46,22 @@ export const vesselTypes: VesselType[] = [
     hasData: true,
   },
   {
+    slug: "ahts",
+    code: "AHTS",
+    nameVi: "Tàu kéo neo & tiếp vận (Anchor Handling Tug Supply)",
+    nameEn: "Anchor Handling Tug Supply Vessel",
+    descVi: "Tàu công suất kéo lớn (bollard pull) chuyên xử lý neo, kéo/dắt và tiếp vận cho công trình ngoài khơi.",
+    descEn: "High bollard-pull vessel for anchor handling, towing and supply of offshore installations.",
+    hasData: true,
+  },
+  {
     slug: "dlb",
     code: "DLB",
     nameVi: "Sà lan cẩu lắp đặt (Derrick Lay Barge)",
     nameEn: "Derrick Lay Barge",
     descVi: "Sà lan mang cẩu cỡ lớn phục vụ lắp đặt/rải đường ống ngoài khơi.",
     descEn: "Barge with heavy derrick crane for offshore installation and pipelay.",
-    hasData: false,
+    hasData: true,
   },
   {
     slug: "floatover-barge",
@@ -61,7 +70,7 @@ export const vesselTypes: VesselType[] = [
     nameEn: "Floatover Barge",
     descVi: "Sà lan chuyên dụng lắp đặt topside bằng phương pháp floatover.",
     descEn: "Specialised barge for topside installation using the floatover method.",
-    hasData: false,
+    hasData: true,
   },
   {
     slug: "floatel",

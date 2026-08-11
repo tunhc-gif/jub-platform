@@ -172,7 +172,7 @@ export default function AIAgent() {
 
   // C#9 — dynamic suggestion chips from the real fleet.
   const chips = useMemo(() => {
-    const ahts = allVessels.filter((v) => v.category === "ocv" || /anchor handling/i.test(String(v.idType))).length;
+    const ahts = allVessels.filter((v) => v.category === "ahts" || /anchor handling/i.test(String(v.idType))).length;
     const dp2 = allVessels.filter((v) => /dp\s*-?\s*2|dps-?2/i.test(String(v.pwrDpClass))).length;
     const list = [
       `${locale === "vi" ? "AHTS bollard pull từ 60t" : "AHTS bollard pull at least 60t"}`,

@@ -302,7 +302,12 @@
       "Bash(node scripts/vessel-photos.mjs --help)",
       "Bash(node -e 'const m=require\\(\"./src/data/vesselPhotos.json\"\\);const k=Object.keys\\(m\\);let t=0;for\\(const i of k\\)t+=\\(m[i].photos||m[i]||[]\\).length||0;console.log\\(\"IMO có ảnh:\",k.length\\);')",
       "Bash(npx next *)",
-      "Bash(git commit -q -m ' *)"
+      "Bash(git commit -q -m ' *)",
+      "Bash(node -e 'const t=require\\(\"C:/Users/tunhc/AppData/Local/Temp/claude/D--VESSEL-JUB-Operation-Manual-jub-platform/71b528e9-c4ab-4a96-b9a6-fe7aca3f492e/scratchpad/vessels-batch/_done/_template.json\"\\);console.log\\(Object.keys\\(t\\).join\\(\"\\\\n\"\\)\\);')",
+      "Bash(node scripts/reclassify.mjs)",
+      "Bash(node scripts/reclassify.mjs --list ocv)",
+      "Bash(xargs grep -lnE \"fetch|useEffect|useState\")",
+      "Bash(node \"C:/Users/tunhc/AppData/Local/Temp/claude/D--VESSEL-JUB-Operation-Manual-jub-platform/71b528e9-c4ab-4a96-b9a6-fe7aca3f492e/scratchpad/countcsv.mjs\")"
     ]
   }
 }

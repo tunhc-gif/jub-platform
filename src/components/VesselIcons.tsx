@@ -158,6 +158,7 @@ export const vesselIconMap: Record<string, (props: IconProps) => JSX.Element> = 
   hlv: HlvIcon,
   jub: JubIcon,
   ocv: OcvIcon,
+  ahts: OcvIcon,
   dsv: DsvIcon,
   dlb: DlbIcon,
   "floatover-barge": FloatoverIcon,

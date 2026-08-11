@@ -64,7 +64,9 @@ type TypeConfig = { token: string; labelVi: string; labelEn: string; categories:
 
 // Match either the vessel's `category` slug OR free-text within idType.
 const TYPE_CONFIGS: TypeConfig[] = [
-  { token: "ahts", labelVi: "AHTS / OCV", labelEn: "AHTS / OCV", categories: ["ocv"], typeKeywords: ["anchor handling", "ahts", "ocv"] },
+  { token: "ahts", labelVi: "AHTS (kéo neo & tiếp vận)", labelEn: "AHTS", categories: ["ahts"], typeKeywords: ["anchor handling", "ahts", "aht"] },
+  { token: "ocv", labelVi: "tàu công trình (OCV/CSV)", labelEn: "construction (OCV/CSV)", categories: ["ocv"], typeKeywords: ["construction", "csv", "ocv", "mpsv", "subsea", "moonpool"] },
+  { token: "dsv", labelVi: "tàu hỗ trợ lặn (DSV)", labelEn: "diving support (DSV)", categories: ["dsv"], typeKeywords: ["diving", "dsv", "saturation", "dive support"] },
   { token: "liftboat", labelVi: "tàu tự nâng / JUB", labelEn: "jack-up / JUB", categories: ["jub"], typeKeywords: ["jack-up", "jack up", "self-elevating", "liftboat", "tự nâng", "jub"] },
   { token: "psv", labelVi: "tàu tiếp vận (PSV)", labelEn: "platform supply (PSV)", categories: ["supply-boat"], typeKeywords: ["platform supply", "psv", "supply vessel"] },
   { token: "crewboat", labelVi: "crewboat", labelEn: "crewboat", categories: ["crewboat"], typeKeywords: ["crew boat", "crewboat", "fast crew"] },

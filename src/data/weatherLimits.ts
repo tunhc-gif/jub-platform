@@ -13,6 +13,7 @@ export type TypeLimits = { relocation: ModeLimit; working: ModeLimit; fromRefere
 export const defaultLimitsByType: Record<string, TypeLimits> = {
   jub: { relocation: { hs: 1.5, windKn: 20 }, working: { hs: 3.0, windKn: 40 }, fromReference: true },
   ocv: { relocation: { hs: 1.8, windKn: 19 }, working: { hs: 2.0, windKn: 25 }, fromReference: true },
+  ahts: { relocation: { hs: 2.5, windKn: 30 }, working: { hs: 2.5, windKn: 30 }, fromReference: false },
   workboat: { relocation: { hs: 1.8, windKn: 20 }, working: { hs: 1.8, windKn: 20 }, fromReference: true },
   hlv: { relocation: { hs: 2.0, windKn: 25 }, working: { hs: 2.5, windKn: 30 }, fromReference: false },
   dsv: { relocation: { hs: 2.0, windKn: 25 }, working: { hs: 1.5, windKn: 20 }, fromReference: false },
