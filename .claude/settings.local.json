@@ -309,7 +309,9 @@
       "Bash(xargs grep -lnE \"fetch|useEffect|useState\")",
       "Bash(node \"C:/Users/tunhc/AppData/Local/Temp/claude/D--VESSEL-JUB-Operation-Manual-jub-platform/71b528e9-c4ab-4a96-b9a6-fe7aca3f492e/scratchpad/countcsv.mjs\")",
       "Bash(pdftotext -layout \"D:/VESSEL/Vessels/TCO/TC Mermaid.pdf\" -)",
-      "Bash(grep -E \"Compiled|error|Error|\\\\[type\\\\]/\\\\[vesselId\\\\]|Generating static\")"
+      "Bash(grep -E \"Compiled|error|Error|\\\\[type\\\\]/\\\\[vesselId\\\\]|Generating static\")",
+      "Bash(pdftotext -layout \"C:/Users/tunhc/AppData/Local/Temp/Permata Ratu_Vessel Specs & GA - \\(CHO\\).pdf\" -)",
+      "Bash(pdftotext -layout \"Intan Ratu_Vessel Specs & GA - \\(CHO\\).pdf\" -)"
     ]
   }
 }
