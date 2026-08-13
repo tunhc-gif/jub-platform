@@ -121,9 +121,12 @@ function classify(v) {
   if (/crew ?boat|\bfcb\b|fast crew|fast (supply|support)|passenger|personnel carrier/.test(t))
     return "crewboat";
   if (speed && speed >= 20 && loa && loa <= 55) return "crewboat";
-  // 10. AHTS
+  // 10. AHTS — kéo neo ngoài khơi. Harbour/port tug (dù BP cao) → workboat.
+  //     Nhánh theo BP chỉ áp cho tàu cỡ ngoài khơi (LOA ≥ 45 m) để không nuốt tug cảng.
+  const tugText = /harbou?r tug|port tug|\basd tug\b|escort tug|terminal tug|azimuth.*tug|\brotor tug\b|pusher tug/.test(t);
   if (ahtsText) return "ahts";
-  if (bp && bp >= 40) return "ahts";
+  if (tugText) return "workboat";
+  if (bp && bp >= 40 && loa && loa >= 45) return "ahts";
   // 11. Supply/PSV
   if (supplyText || /\bosv\b/.test(t)) return "supply-boat";
   if (hasBrineMud) return "supply-boat";
