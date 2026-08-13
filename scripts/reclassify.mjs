@@ -93,6 +93,9 @@ function classify(v) {
   const diveText = /saturation|diving|dive support|\bdsv\b|\bdive\b|dive spread|dive bell/.test(t);
   const hasBrineMud = num(v.tankBrineTotalM3) || /mud|brine|drill ?water/.test(t);
 
+  // 0. Họ Telford: sà lan lưu trú + thi công DP3 (cẩu AHC ~400t) — gom về OCV
+  //    cho nhất quán cả dòng (Telford 25/28/31/33/34).
+  if (/\btelford\s*\d/.test(t)) return "ocv";
   // 1. JUB — chân tự nâng (không tính tàu khai báo là AHTS/Supply)
   if (((legs && legs >= 3) || num(v.jackUnitsTotal) || jackText) && !ahtsText && !supplyText)
     return "jub";
