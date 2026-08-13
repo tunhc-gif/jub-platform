@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Info, Radar, ExternalLink, CloudRain, ChevronRight, Camera } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import VesselPhotos from "@/components/VesselPhotos";
+import ClassSurvey from "@/components/ClassSurvey";
 import vesselPhotos from "@/data/vesselPhotos.json";
 import { useLanguage } from "@/context/LanguageContext";
 import { useVesselData } from "@/context/VesselDataContext";
@@ -95,6 +96,8 @@ export default function VesselDetailPage({
           <p className="text-xs italic text-ink-soft">{t("trackingNoImo")}</p>
         )}
       </div>
+
+      <ClassSurvey imo={imo} society={vessel.idClassSociety} notation={vessel.idNotation} />
 
       <Link
         href={`/weather-downtime?type=${params.type}&vessel=${vessel.id}`}
