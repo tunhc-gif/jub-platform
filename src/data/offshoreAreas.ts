@@ -49,6 +49,7 @@ export type OffshoreField = {
   defaultHsLimit?: number; // default operational Hs limit (m)
   mapLat?: number; // decimal latitude (for map embed)
   mapLng?: number; // decimal longitude (for map embed)
+  hidden?: boolean; // true = ẩn khỏi danh sách + route tĩnh (giữ dữ liệu để bật lại)
 };
 
 export type OffshoreCountry = {
@@ -308,6 +309,9 @@ export const offshoreFields: OffshoreField[] = [
   {
     slug: "arabian-gulf-ksa",
     countrySlug: "ksa",
+    // ẨN tạm: lớp sóng đang dùng phân bố annual áp đều 12 tháng (nguồn không có Hs
+    // theo tháng) nên chưa phản ánh mùa Shamal. Bật lại khi có dữ liệu Hs theo tháng.
+    hidden: true,
     region: "Arabian Gulf (Saudi Aramco)",
     nameVi: "Vịnh Ba Tư – Khu vực Saudi Aramco",
     nameEn: "Arabian Gulf – Saudi Aramco Area",
@@ -341,7 +345,7 @@ export const regionsByCountry: Record<string, string[]> = {
 };
 
 export function fieldsForCountry(countrySlug: string): OffshoreField[] {
-  return offshoreFields.filter((f) => f.countrySlug === countrySlug);
+  return offshoreFields.filter((f) => f.countrySlug === countrySlug && !f.hidden);
 }
 
 export function getField(countrySlug: string, fieldSlug: string): OffshoreField | undefined {
