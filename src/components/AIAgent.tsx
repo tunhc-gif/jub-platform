@@ -50,7 +50,28 @@ function keywordMatchReason(v: JubVessel, q: string): string {
 
 type Answer = { text: string; vessels: Vessel[]; describe: (v: Vessel) => string; confidence: Confidence };
 
+const CLASS_ASK = /drydock|dry-dock|lên đà|len da|special survey|periodic survey|đăng kiểm định kỳ|còn class|con class|treo class|withdrawn|suspended|hết hạn|het han|class status|tình trạng class|tinh trang class|class certificate|chứng chỉ đăng kiểm|giấy chứng nhận class/i;
+
 function answerFor(query: string, locale: Locale, tt: (key: DictKey) => string, allVessels: Vessel[]): Answer {
+  // Group 7 — class / drydock / survey status is DYNAMIC data the platform does
+  // not store; guide the user to the per-vessel "Class & Survey" lookup instead
+  // of returning a misleading "not found".
+  if (CLASS_ASK.test(query)) {
+    return {
+      text:
+        locale === "vi"
+          ? 'Trạng thái class, hạn lên đà (drydock) và hạn kiểm định là dữ liệu ĐỘNG — chỉ đăng kiểm mới có giá trị pháp lý, nền tảng không lưu. Hãy mở trang chi tiết một tàu → mục "Cấp tàu & Kiểm định (Class & Survey)" và bấm Equasis / cổng đăng kiểm để tra theo IMO (bản mới nhất).'
+          : 'Class status, next drydock and survey windows are DYNAMIC — only the classification society is authoritative and the platform does not store them. Open a vessel detail page → "Class & Survey" and use the Equasis / society links to check by IMO (latest record).',
+      vessels: [],
+      describe: () => "",
+      confidence: {
+        level: "low",
+        reasonVi: "Thông tin class/drydock không lưu trên nền tảng — tra trực tiếp từ đăng kiểm theo IMO.",
+        reasonEn: "Class/drydock info is not stored here — look it up from the society by IMO.",
+      },
+    };
+  }
+
   // B#5 — vessel ↔ field/month matching (uses the weather engine).
   const field = detectField(query);
   if (field) {
@@ -172,20 +193,31 @@ export default function AIAgent() {
 
   // C#9 — dynamic suggestion chips from the real fleet.
   const chips = useMemo(() => {
-    const ahts = allVessels.filter((v) => v.category === "ahts" || /anchor handling/i.test(String(v.idType))).length;
     const dp2 = allVessels.filter((v) => /dp\s*-?\s*2|dps-?2/i.test(String(v.pwrDpClass))).length;
-    const list = [
-      `${locale === "vi" ? "AHTS bollard pull từ 60t" : "AHTS bollard pull at least 60t"}`,
-      `${locale === "vi" ? "Tàu DP2" : "DP2 vessels"}${dp2 ? ` (${dp2})` : ""}`,
-      `${locale === "vi" ? "Cẩu chính lớn hơn 100t" : "Main crane greater than 100t"}`,
-      `${locale === "vi" ? "POB từ 200 người" : "POB at least 200"}`,
-      locale === "vi" ? "Tàu tự nâng lớn nhất" : "Largest liftboat",
-      locale === "vi" ? "JUB ở Trung Đông" : "JUB in the Middle East",
-      locale === "vi" ? "OCV ở Việt Nam" : "OCV in Vietnam",
-      locale === "vi" ? "Lạc Đà Vàng tháng 7" : "Lac Da Vang in July",
+    const dp3 = allVessels.filter((v) => /dp\s*-?\s*3|dps-?3/i.test(String(v.pwrDpClass))).length;
+    const vi = locale === "vi";
+    return [
+      // 1 — năng lực
+      vi ? "Cẩu chính từ 150 tấn" : "Main crane from 150t",
+      vi ? "Bollard pull trên 100 tấn" : "Bollard pull over 100t",
+      `${vi ? "Tàu DP2" : "DP2 vessels"}${dp2 ? ` (${dp2})` : ""}`,
+      `${vi ? "Tàu DP3" : "DP3 vessels"}${dp3 ? ` (${dp3})` : ""}`,
+      vi ? "POB từ 200 người" : "POB from 200",
+      vi ? "Chiều dài dưới 60m" : "Length under 60m",
+      vi ? "Tốc độ trên 20 hải lý" : "Speed over 20 kn",
+      // 2 — nhiều tiêu chí
+      vi ? "Tàu tự nâng POB từ 150 và cẩu từ 100 tấn" : "Jack-up POB from 150 and crane from 100t",
+      // 4 — siêu hạng / sắp xếp
+      vi ? "Tàu tự nâng lớn nhất" : "Largest liftboat",
+      vi ? "AHTS bollard pull mạnh nhất" : "Strongest AHTS bollard pull",
+      // 5 — khu vực
+      vi ? "JUB ở Trung Đông" : "JUB in the Middle East",
+      vi ? "OCV ở Việt Nam" : "OCV in Vietnam",
+      // 6 — mỏ/tháng
+      vi ? "Lạc Đà Vàng tháng 7" : "Lac Da Vang in July",
+      // 7 — class/drydock (ra hướng dẫn)
+      vi ? "Kiểm tra class / lên đà" : "Check class / drydock",
     ];
-    void ahts;
-    return list;
   }, [allVessels, locale]);
 
   const nameQuery = input.trim().toLowerCase();
