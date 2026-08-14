@@ -374,7 +374,9 @@
       "Bash(python3 -c \"import fitz; print\\('ok3'\\)\")",
       "Bash(pdftoppm -png -r 130 -f 1 -l 1 \"1. LHD NL02 SPEC \\(PDF\\)-2025.pdf\" \"C:/Users/tunhc/AppData/Local/Temp/claude/D--VESSEL-JUB-Operation-Manual-jub-platform/71b528e9-c4ab-4a96-b9a6-fe7aca3f492e/scratchpad/vessels-batch/lhd_nl02\")",
       "Bash(node \"C:/Users/tunhc/AppData/Local/Temp/claude/D--VESSEL-JUB-Operation-Manual-jub-platform/71b528e9-c4ab-4a96-b9a6-fe7aca3f492e/scratchpad/apply-imo.mjs\")",
-      "Bash(node \"C:/Users/tunhc/AppData/Local/Temp/claude/D--VESSEL-JUB-Operation-Manual-jub-platform/71b528e9-c4ab-4a96-b9a6-fe7aca3f492e/scratchpad/apply-imo.mjs\" --apply)"
+      "Bash(node \"C:/Users/tunhc/AppData/Local/Temp/claude/D--VESSEL-JUB-Operation-Manual-jub-platform/71b528e9-c4ab-4a96-b9a6-fe7aca3f492e/scratchpad/apply-imo.mjs\" --apply)",
+      "Bash(git remote *)",
+      "Bash(git commit --allow-empty -q -m 'Trigger rebuild after repo rename jub-platform -> offshore-fleet *)"
     ]
   }
 }

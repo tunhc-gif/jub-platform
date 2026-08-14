@@ -55,7 +55,7 @@ const FIELD_CONFIGS: FieldConfig[] = [
   { field: "dimWidth", labelVi: "chiều rộng", labelEn: "beam", unit: "m", keywords: ["chiều rộng", "chieu rong", "beam", "bề rộng", "be rong", "rộng"] },
   { field: "idYear", labelVi: "năm đóng", labelEn: "build year", keywords: ["năm đóng", "nam dong", "đóng năm", "dong nam", "build year", "năm sản xuất"] },
   { field: "dimLegsQty", labelVi: "số lượng chân", labelEn: "number of legs", keywords: ["số chân", "so chan", "số lượng chân", "number of legs", "legs"] },
-  { field: "craneMainSwl", labelVi: "SWL cẩu", labelEn: "crane SWL", unit: "t", keywords: ["cẩu", "cau", "crane", "swl"] },
+  { field: "craneMainSwl", labelVi: "SWL cẩu", labelEn: "crane SWL", unit: "t", keywords: ["cẩu", "cau", "crane", "swl", "sức nâng", "suc nang", "tải nâng", "tai nang", "sức cẩu", "suc cau"] },
 ];
 
 // ---- Category (type + flag) config ---------------------------------------
@@ -162,6 +162,16 @@ function findOperatorValue(q: string): { operator: Operator; value: number } | n
   return null;
 }
 
+// A bare number with no comparison word, e.g. "cẩu 100 tấn", "POB 200".
+// DP / FiFi tokens are stripped first so their digits aren't mistaken for the value.
+function findBareNumber(q: string): number | null {
+  const cleaned = q
+    .replace(/\bdps?\s*-?\s*\d/gi, " ")
+    .replace(/\bfi\s*-?\s*fi\s*\d?/gi, " ");
+  const m = cleaned.match(/(\d+(?:[.,]\d+)?)/);
+  return m ? parseFloat(m[1].replace(",", ".")) : null;
+}
+
 function findRange(q: string): { min: number; max: number } | null {
   for (const re of RANGE_PATTERNS) {
     const m = q.match(re);
@@ -192,6 +202,32 @@ function extractLeadingNumber(raw: string | number | undefined): number | null {
   const m = s.match(/(\d+(?:[.,]\d+)?)/);
   if (!m) return null;
   return parseFloat(m[1].replace(",", "."));
+}
+
+// Crane SWL: read the tonnage that sits before a t/ton/MT unit and take the max,
+// ignoring model numbers like "GPT 115" or "HSC100". Thousands "5.000 t" → 5000.
+function craneTonnage(raw: string | number | undefined): number | null {
+  if (raw === undefined || raw === null) return null;
+  const s = String(raw);
+  if (/không tìm thấy|không áp dụng/i.test(s)) return null;
+  const re = /(\d[\d.,]*)\s*(?:te|mt|tonnes?|tons?|t)\b/gi;
+  let m: RegExpExecArray | null;
+  let max: number | null = null;
+  while ((m = re.exec(s)) !== null) {
+    const rawNum = m[1];
+    const val = /^\d{1,3}(?:[.,]\d{3})+$/.test(rawNum)
+      ? parseFloat(rawNum.replace(/[.,]/g, ""))
+      : parseFloat(rawNum.replace(/,/g, ""));
+    if (!Number.isNaN(val) && (max === null || val > max)) max = val;
+  }
+  return max;
+}
+
+// Field-aware numeric extraction: crane fields need the tonnage-before-unit parser;
+// everything else (bollard pull, LOA, POB, DWT…) uses the leading headline number.
+function fieldNumber(field: keyof JubVessel, raw: string | number | undefined): number | null {
+  if (field === "craneMainSwl" || field === "craneAuxSwl") return craneTonnage(raw);
+  return extractLeadingNumber(raw);
 }
 
 function compare(a: number, op: Operator, b: number): boolean {
@@ -287,6 +323,16 @@ function detectClauseConditions(clause: string): Condition[] {
           type: "numeric",
           match: { field: fieldCfg.field, fieldLabelVi: fieldCfg.labelVi, fieldLabelEn: fieldCfg.labelEn, operator: opVal.operator, value: opVal.value, unit: fieldCfg.unit },
         });
+      } else {
+        // Bare "<field> <number>" (no comparison word) → treat as "at least" (≥),
+        // the usual capability-search intent, e.g. "Cẩu 100 tấn" = crane ≥ 100 t.
+        const bare = findBareNumber(q);
+        if (bare !== null) {
+          out.push({
+            type: "numeric",
+            match: { field: fieldCfg.field, fieldLabelVi: fieldCfg.labelVi, fieldLabelEn: fieldCfg.labelEn, operator: ">=", value: bare, unit: fieldCfg.unit },
+          });
+        }
       }
     }
   }
@@ -320,13 +366,13 @@ function applyCondition(vessels: JubVessel[], cond: Condition): JubVessel[] {
   if (cond.type === "range") {
     const { field, min, max } = cond.match;
     return vessels.filter((v) => {
-      const n = extractLeadingNumber(v[field] as string | number | undefined);
+      const n = fieldNumber(field, v[field] as string | number | undefined);
       return n !== null && n >= min && n <= max;
     });
   }
   const { field, operator, value } = cond.match;
   return vessels.filter((v) => {
-    const n = extractLeadingNumber(v[field] as string | number | undefined);
+    const n = fieldNumber(field, v[field] as string | number | undefined);
     return n !== null && compare(n, operator, value);
   });
 }
@@ -355,7 +401,7 @@ function detectSort(query: string): SortSpec | null {
 
 function applySort(vessels: JubVessel[], sort: SortSpec): JubVessel[] {
   const withNum = vessels
-    .map((v) => ({ v, n: extractLeadingNumber(v[sort.field] as string | number | undefined) }))
+    .map((v) => ({ v, n: fieldNumber(sort.field, v[sort.field] as string | number | undefined) }))
     .filter((x) => x.n !== null) as { v: JubVessel; n: number }[];
   withNum.sort((a, b) => (sort.dir === "asc" ? a.n - b.n : b.n - a.n));
   return withNum.map((x) => x.v);
@@ -424,7 +470,7 @@ export function parseStructuredQuery(query: string, vessels: JubVessel[]): Struc
     .map((c) => c.match.field);
   let coverage = 1;
   if (numFields.length > 0) {
-    const covs = numFields.map((f) => vessels.filter((v) => extractLeadingNumber(v[f] as string | number) !== null).length / Math.max(1, vessels.length));
+    const covs = numFields.map((f) => vessels.filter((v) => fieldNumber(f, v[f] as string | number) !== null).length / Math.max(1, vessels.length));
     coverage = Math.min(...covs);
   }
 
