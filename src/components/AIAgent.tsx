@@ -213,6 +213,12 @@ export default function AIAgent() {
       // 5 — khu vực
       vi ? "JUB ở Trung Đông" : "JUB in the Middle East",
       vi ? "OCV ở Việt Nam" : "OCV in Vietnam",
+      // 3 — năng lực / chức năng
+      vi ? "Tàu đa nhiệm (multi-purpose)" : "Multi-purpose vessels",
+      vi ? "Tàu rải ống (pipelay)" : "Pipelay vessels",
+      vi ? "Tàu thi công ngầm / ROV" : "Subsea / ROV vessels",
+      vi ? "Cẩu bù chuyển động (AHC)" : "Active-heave crane (AHC)",
+      vi ? "Tàu chữa cháy (FiFi)" : "Fire-fighting (FiFi)",
       // 6 — mỏ/tháng
       vi ? "Lạc Đà Vàng tháng 7" : "Lac Da Vang in July",
       // 7 — class/drydock (ra hướng dẫn)

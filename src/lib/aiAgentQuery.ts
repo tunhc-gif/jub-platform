@@ -22,7 +22,7 @@ export type RangeMatch = {
   unit?: string;
 };
 
-export type CategoryKind = "type" | "flag" | "region";
+export type CategoryKind = "type" | "flag" | "region" | "capability";
 
 export type Condition =
   | { type: "numeric"; match: FieldMatch }
@@ -122,6 +122,94 @@ const REGION_CONFIGS: { token: string; labelVi: string; labelEn: string; trigger
 
 function regionHaystack(v: JubVessel): string {
   return [v.idFlag, v.idOwner, v.idPort, v.idLocation].join(" ").toLowerCase();
+}
+
+// ---- Capability config (function/role, read from idType + notation) --------
+// Matches a vessel's DECLARED capabilities in its type / class notation text,
+// independent of category (e.g. a pipelay unit may be DLB or OCV).
+type CapabilityConfig = { token: string; labelVi: string; labelEn: string; triggers: string[]; signals: RegExp };
+
+const CAPABILITY_CONFIGS: CapabilityConfig[] = [
+  {
+    token: "multipurpose",
+    labelVi: "đa nhiệm / đa năng (multi-purpose)",
+    labelEn: "multi-purpose",
+    triggers: ["đa nhiệm", "da nhiem", "đa năng", "da nang", "đa dụng", "da dung", "multi-purpose", "multipurpose", "multi purpose", "multi-role", "multi role", "multirole"],
+    signals: /multi.?purpose|multi.?role|\bmpsv\b|\bmpv\b|đa năng|đa nhiệm|đa dụng/i,
+  },
+  {
+    token: "pipelay",
+    labelVi: "rải ống (pipelay)",
+    labelEn: "pipelay",
+    triggers: ["rải ống", "rai ong", "rải đường ống", "rai duong ong", "pipelay", "pipe lay", "pipe-lay", "reel lay", "s-lay", "j-lay", "lay barge"],
+    signals: /pipe.?lay|reel.?lay|s-?lay|j-?lay|flex.?lay|lay ?barge|stinger|firing line/i,
+  },
+  {
+    token: "cablelay",
+    labelVi: "rải cáp (cable lay)",
+    labelEn: "cable lay",
+    triggers: ["rải cáp", "rai cap", "cable lay", "cablelay", "cable-lay"],
+    signals: /cable.?lay/i,
+  },
+  {
+    token: "subsea",
+    labelVi: "thi công ngầm / ROV (subsea)",
+    labelEn: "subsea / ROV",
+    triggers: ["thi công ngầm", "thi cong ngam", "công trình ngầm", "cong trinh ngam", "subsea", "rov", "imr", "moonpool"],
+    signals: /subsea|\brov\b|\bimr\b|moonpool|inspection.?maintenance.?repair/i,
+  },
+  {
+    token: "welliv",
+    labelVi: "can thiệp giếng (well intervention)",
+    labelEn: "well intervention",
+    triggers: ["can thiệp giếng", "can thiep gieng", "well intervention", "well service", "wireline"],
+    signals: /well intervention|well service|wireline|coiled tubing/i,
+  },
+  {
+    token: "ahc",
+    labelVi: "cẩu bù chuyển động (AHC)",
+    labelEn: "active-heave crane (AHC)",
+    triggers: ["cẩu bù", "cau bu", "bù chuyển động", "bu chuyen dong", "ahc", "active heave", "heave compensat"],
+    signals: /\bahc\b|active heave|heave compensat|bù chuyển động|3d ?compensat/i,
+  },
+  {
+    token: "fifi",
+    labelVi: "chữa cháy (FiFi)",
+    labelEn: "fire-fighting (FiFi)",
+    triggers: ["chữa cháy", "chua chay", "cứu hỏa", "cuu hoa", "fifi", "fi-fi", "fire fighting", "firefighting", "fire-fighting"],
+    signals: /fi-?fi|fire.?fighting/i,
+  },
+  {
+    token: "w2w",
+    labelVi: "cầu bù chuyển động / walk-to-work (W2W)",
+    labelEn: "walk-to-work (W2W)",
+    triggers: ["walk to work", "walk-to-work", "w2w", "gangway", "cầu bù", "cau bu chuyen dong", "ampelmann"],
+    signals: /walk.?to.?work|\bw2w\b|gangway|ampelmann/i,
+  },
+];
+
+function capabilityHaystack(v: JubVessel): string {
+  return [v.idType, v.idNotation, v.nameNote, v.displayName, v.craneMainSwl, v.craneAuxSwl]
+    .map((x) => String(x ?? ""))
+    .join(" | ")
+    .toLowerCase();
+}
+
+function detectCapabilityConditions(q: string): Condition[] {
+  const out: Condition[] = [];
+  for (const cfg of CAPABILITY_CONFIGS) {
+    if (cfg.triggers.some((tr) => q.includes(tr))) {
+      out.push({
+        type: "category",
+        kind: "capability",
+        token: cfg.token,
+        labelVi: cfg.labelVi,
+        labelEn: cfg.labelEn,
+        test: (v) => cfg.signals.test(capabilityHaystack(v)),
+      });
+    }
+  }
+  return out;
 }
 
 const OPERATOR_PREFIX: { operator: Operator; patterns: RegExp[] }[] = [
@@ -339,6 +427,9 @@ function detectClauseConditions(clause: string): Condition[] {
 
   const typeCond = detectTypeCondition(q);
   if (typeCond) out.push(typeCond);
+
+  // Capability/function (đa nhiệm, rải ống, ROV, FiFi…) — matched from type/notation text.
+  for (const cap of detectCapabilityConditions(q)) out.push(cap);
 
   // Region takes precedence over a bare flag match (region is broader: flag + owner + port).
   const regionCond = detectRegionCondition(q);
